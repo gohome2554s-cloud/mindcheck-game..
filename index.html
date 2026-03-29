@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MindCheck</title>
+<style>
+  body{
+    margin:0;
+    font-family:sans-serif;
+    background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+  }
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    background:rgba(0,0,0,0.28);
+    backdrop-filter: blur(8px);
+  }
+  .profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .profile img{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #fff;
+    background:#fff;
+    cursor:pointer;
+  }
+  .ptext{
+    line-height:1.15;
+    min-width:0;
+  }
+  .ptext .name{
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:170px;
+  }
+  .ptext .sub{
+    font-size:12px;
+    opacity:.9;
+  }
+  .gems{
+    background:rgba(255,255,255,0.12);
+    padding:8px 12px;
+    border-radius:14px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .tabs{
+    display:flex;
+    gap:10px;
+    margin:14px;
+    flex-wrap:wrap;
+  }
+  .tabbtn{
+    flex:1;
+    min-width:110px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.08);
+    color:#fff;
+    padding:12px;
+    border-radius:14px;
+  }
+  .section{
+    margin:14px;
+  }
+  .title{
+    font-size:15px;
+    margin:0 0 8px 4px;
+    opacity:.9;
+  }
+  .card{
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:22px;
+    padding:18px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+  }
+  .grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+  }
+  button{
+    padding:12px 14px;
+    border:none;
+    border-radius:14px;
+    background:#ff4d6d;
+    color:#fff;
+    font-size:15px;
+  }
+  button:disabled{
+    opacity:.55;
+  }
+  .choice,.btn-wide{
+    min-width:140px;
+  }
+  input[type="text"], input[type="number"]{
+    width:100%;
+    max-width:320px;
+    box-sizing:border-box;
+    display:block;
+    margin:10px auto;
+    padding:12px 14px;
+    border:none;
+    border-radius:12px;
+    text-align:center;
+    font-size:15px;
+    outline:none;
+  }
+  input[type="file"]{
+    display:none;
+  }
+  .hidden{display:none;}
+  .muted{
+    opacity:.85;
+    font-size:13px;
+    line-height:1.4;
+  }
+  .result{
+    font-size:20px;
+    font-weight:800;
+    animation:pop .35s ease;
+  }
+  @keyframes pop{
+    0%{transform:scale(.85);opacity:0}
+    100%{transform:scale(1);opacity:1}
+  }
+  .smallnote{
+    font-size:12px;
+    opacity:.8;
+    margin-top:8px;
+  }
+  .barWrap{
+    width:100%;
+    max-width:320px;
+    margin:10px auto 0;
+    text-align:left;
+  }
+  .barLabel{
+    font-size:13px;
+    margin:8px 0 4px;
+  }
+  .bar{
+    width:100%;
+    height:12px;
+    background:rgba(255,255,255,.12);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .bar > div{
+    height:100%;
+    border-radius:999px;
+    background:#ff4d6d;
+  }
+  .missionCard{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:12px;
+    min-width:140px;
+    max-width:180px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="profile">
+    <img id="avatar" src="https://i.imgur.com/6VBx3io.png" alt="avatar" onclick="pickAvatar()">
+    <div class="ptext">
+      <div class="name" id="displayName">ชื่อมึง</div>
+      <div class="sub" id="uidText">UID: -</div>
+      <div class="sub" id="lvText">LV: -</div>
+    </div>
+  </div>
+  <div class="gems" id="gemsText">💎 10 | 💰 1000 | ⏱ 0</div>
+</div>
+
+<div class="tabs">
+  <button class="tabbtn" onclick="showZone('dailyZone')">🎁 แตกของ</button>
+  <button class="tabbtn" onclick="showZone('profileZone')">👤 โปรไฟล์</button>
+  <button class="tabbtn" onclick="showZone('shopZone')">💎 ร้านเพชร</button>
+  <button class="tabbtn" onclick="showZone('clanZone')">🏰 แคลน</button>
+  <button class="tabbtn" onclick="showZone('gameZone')">🎮 เกม</button>
+</div>
+
+<div id="dailyZone" class="section">
+  <div class="title">🎁 แตกของรายวัน</div>
+  <div class="card">
+    <h2 id="dailyTitle" style="margin-top:0;">ของวันนี้</h2>
+    <p id="dailyStreakText" class="muted"></p>
+    <p id="dailyRewardText" class="muted"></p>
+    <button id="dailyClaimBtn" class="btn-wide" onclick="claimDailyReward()">รับของวันนี้</button>
+    <p class="smallnote">ครบ 7 วันแล้ววนใหม่ ของจะไล่จาก 1 → 7 → 1 ไปเรื่อยๆ</p>
+  </div>
+</div>
+
+<div id="profileZone" class="section">
+  <div class="title">👤 โปรไฟล์</div>
+  <div class="card">
+    <input id="nameInput" type="text" placeholder="ตั้งชื่อโปรไฟล์">
+    <button class="btn-wide" onclick="saveName()">บันทึกชื่อ</button>
+
+    <p class="muted" id="avatarNote" style="margin-top:14px;">กดรูปตัวเองด้านบนเพื่อเปลี่ยนรูป</p>
+    <p class="smallnote">เลือกรูปครั้งแรกฟรี หลังจากนั้นเปลี่ยนแต่ละครั้งใช้ 20💎</p>
+
+    <input id="avatarUpload" type="file" accept="image/*">
+  </div>
+
+  <div id="petCard" class="card hidden" style="margin-top:12px;">
+    <h3 style="margin-top:0;">🐾 สัตว์เลี้ยง</h3>
+    <p id="petText" class="muted"></p>
+    <button class="btn-wide" onclick="feedPet()">เลี้ยงสัตว์ (20💰)</button>
+  </div>
+
+  <div id="statsCard" class="card hidden" style="margin-top:12px;">
+    <h3 style="margin-top:0;">📊 สถิติ</h3>
+    <p id="statsText" class="muted"></p>
+  </div>
+</div>
+
+<div id="shopZone" class="section hidden">
+  <div class="title">💎 ร้านเพชร</div>
+  <div class="card">
+    <h2 style="margin-top:0;">จะอัปเดตเร็วๆนี้</h2>
+    <p class="muted">ตอนนี้ยังไม่สามารถเติมเพชรได้</p>
+  </div>
+
+  <div style="height:12px"></div>
+
+  <div class="title">📋 ภารกิจรับเพชร</div>
+  <div class="card">
+    <div id="missionList" class="grid"></div>
+  </div>
+
+  <div style="height:12px"></div>
+
+  <div class="title">🎁 ใช้เงิน/เพชร</div>
+  <div class="card">
+    <div class="grid">
+      <button onclick="buyTime()">+เวลา (100💰)</button>
+      <button onclick="skipQuestion()">ลัดคำตอบ (200💰)</button>
+      <button onclick="gacha()">🎲 สุ่มของ (30💎)</button>
+    </div>
+    <p class="muted" style="margin-top:10px;">เวลาโบนัสใช้เก็บไว้ดูในโปรไฟล์ / ลัดคำตอบใช้ข้ามคำถามได้ในโหมดปกติ</p>
+  </div>
+</div>
+
+<div id="clanZone" class="section hidden">
+  <div class="title">🏰 แคลน</div>
+  <div class="card">
+    <p class="muted" id="clanText">ยังไม่มีแคลน</p>
+    <p class="muted" id="clanCodeText">โค้ดแคลน: -</p>
+    <p class="muted" id="clanMembersText">สมาชิก: -</p>
+
+    <div class="grid" style="margin-top:12px;">
+      <button class="btn-wide" onclick="createClan()">สร้างแคลน (500💰)</button>
+      <button class="btn-wide" id="inviteClanBtn" onclick="inviteClan()">เชิญคนเข้าแคลน</button>
+      <button class="btn-wide" onclick="joinClan()">เข้าแคลนด้วยโค้ด</button>
+    </div>
+    <p class="muted" style="margin-top:10px;">เชิญคนเข้าแคลนจะปลดล็อกวันที่ 4 ของแตกของรายวัน</p>
+  </div>
+</div>
+
+<div id="gameZone" class="section hidden">
+  <div class="title">🎮 เกม</div>
+
+  <div id="modePage" class="card">
+    <h2 style="margin-top:0;">เลือกโหมด</h2>
+    <input id="targetInput" type="text" placeholder="ชื่ออีกคน">
+    <div class="grid">
+      <button class="btn-wide" onclick="startGame('friend')">👬 เพื่อน</button>
+      <button class="btn-wide" onclick="startGame('love')">❤️ แฟน</button>
+      <button class="btn-wide" onclick="startGame('family')">🏠 ครอบครัว</button>
+      <button class="btn-wide" onclick="startGame('y2017')">📼 วัย 2017</button>
+      <button class="btn-wide" onclick="openBattleMode('standard')">⚔️ เกมไหนดังกว่ากัน</button>
+      <button class="btn-wide" id="footballBattleBtn" onclick="openBattleMode('football')">⚽ นักเตะคนไหนเก่งกว่ากัน</button>
+    </div>
+    <p class="muted">1–5 ปกติ / 6–10 เริ่มแปลก / 11–15 พีค</p>
+  </div>
+
+  <div id="battleSetup" class="card hidden">
+    <h2 id="battleSetupTitle" style="margin-top:0;">เกมไหนดังกว่ากัน</h2>
+    <p id="battleSetupDesc" class="muted">โหมดดวล 13 ข้อ บอก % ชัดเจน</p>
+    <input id="battleA" type="text" placeholder="เกม / สิ่งของ 1">
+    <input id="battleB" type="text" placeholder="เกม / สิ่งของ 2">
+    <button class="btn-wide" onclick="startBattle()">เริ่มดวล</button>
+  </div>
+
+  <div id="quizPage" class="card hidden">
+    <h3 id="playerText"></h3>
+    <h2 id="questionText"></h2>
+    <p id="levelHint" class="muted"></p>
+    <div class="grid">
+      <button id="btn1" class="choice" onclick="answer(true)">ถูก</button>
+      <button id="btn2" class="choice" onclick="answer(false)">ผิด</button>
+    </div>
+    <div class="smallnote">เสียงจะแยกชัดตามปุ่ม ถูก / ผิด</div>
+  </div>
+
+  <div id="resultPage" class="card hidden">
+    <h2>🎉 เล่นครบแล้ว!</h2>
+    <p class="muted">ให้เพื่อน/แฟน/ครอบครัวมึงใส่คะแนนจริง 👇</p>
+    <input id="realScore" type="number" min="0" max="15" placeholder="เช่น 9">
+    <button class="btn-wide" onclick="showResult()">สรุปผล</button>
+    <h3 id="finalText" class="result"></h3>
+  </div>
+
+  <div id="battleResultPage" class="card hidden">
+    <h2>🏆 ผลดวล</h2>
+    <h3 id="battleResultText" class="result"></h3>
+    <div id="battleBars"></div>
+    <button class="btn-wide" onclick="resetGame()">กลับหน้าหลัก</button>
+  </div>
+</div>
+
+<script>
+const MAX_LEVEL = 45;
+
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    return JSON.parse(raw);
+  }catch(e){
+    return fallback;
+  }
+}
+
+function pad(n){
+  return String(n).padStart(2, "0");
+}
+function todayKey(d = new Date()){
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function dateFromKey(key){
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function isYesterday(key){
+  if(!key) return false;
+  const d = dateFromKey(key);
+  const y = new Date();
+  y.setDate(y.getDate() - 1);
+  return d.toDateString() === y.toDateString();
+}
+function dayName(day){
+  switch(day){
+    case 1: return "Day 1";
+    case 2: return "Day 2";
+    case 3: return "Day 3";
+    case 4: return "Day 4";
+    case 5: return "Day 5";
+    case 6: return "Day 6";
+    case 7: return "Day 7";
+    default: return "Day 1";
+  }
+}
+function describeDailyReward(day){
+  switch(day){
+    case 1: return "เงิน +2000";
+    case 2: return "เพชร +15";
+    case 3: return "ปลดล็อกสัตว์เลี้ยง";
+    case 4: return "เชิญคนเข้าแคลนได้";
+    case 5: return "ปลดล็อกสถิติ";
+    case 6: return "ปลดล็อกโหมดนักเตะ";
+    case 7: return "เพชร +100 + เวลตัน 45";
+    default: return "ของพิเศษ";
+  }
+}
+function applyDailyReward(day){
+  let msg = "";
+
+  if(day === 1){
+    coins += 2000;
+    msg = "ได้รับเงิน +2000";
+  }else if(day === 2){
+    gems += 15;
+    msg = "ได้รับเพชร +15";
+  }else if(day === 3){
+    petUnlocked = true;
+    msg = "ปลดล็อกสัตว์เลี้ยงแล้ว";
+  }else if(day === 4){
+    canInviteClan = true;
+    msg = "เชิญคนเข้าแคลนได้แล้ว";
+  }else if(day === 5){
+    statsUnlocked = true;
+    msg = "ปลดล็อกสถิติแล้ว";
+  }else if(day === 6){
+    unlockedFootball = true;
+    msg = "ปลดล็อกโหมดนักเตะแล้ว";
+  }else if(day === 7){
+    gems += 100;
+    msg = "ได้รับเพชร +100 และเวลตัน 45";
+  }
+
+  saveStore();
+  return msg;
+}
+
+/* ===== profile / storage ===== */
+let uid = localStorage.getItem("uid");
+if(!uid){
+  uid = "ID-" + Math.floor(100000 + Math.random() * 900000);
+  localStorage.setItem("uid", uid);
+}
+let lv = parseInt(localStorage.getItem("lv") || "1", 10);
+let gems = parseInt(localStorage.getItem("gems") || "10", 10);
+let coins = parseInt(localStorage.getItem("coins") || "1000", 10);
+let timeBoost = parseInt(localStorage.getItem("timeBoost") || "0", 10);
+let avatar = localStorage.getItem("avatar") || "https://i.imgur.com/6VBx3io.png";
+let savedName = localStorage.getItem("profileName") || "";
+
+let clanName = localStorage.getItem("clanName") || "";
+let clanCode = localStorage.getItem("clanCode") || "";
+let clanMembers = loadJSON("clanMembers", []);
+
+let petUnlocked = localStorage.getItem("petUnlocked") === "true";
+let petExp = parseInt(localStorage.getItem("petExp") || "0", 10);
+let canInviteClan = localStorage.getItem("canInviteClan") === "true";
+let statsUnlocked = localStorage.getItem("statsUnlocked") === "true";
+let unlockedFootball = localStorage.getItem("unlockedFootball") === "true";
+let correctGuess = parseInt(localStorage.getItem("correctGuess") || "0", 10);
+let totalGuess = parseInt(localStorage.getItem("totalGuess") || "0", 10);
+
+let dailyStreak = parseInt(localStorage.getItem("dailyStreak") || "0", 10);
+let dailyLastClaim = localStorage.getItem("dailyLastClaim") || "";
+
+let missionDone = loadJSON("missionDone", {});
+let missionClaimed = loadJSON("missionClaimed", {});
+
+const missionData = [
+  { id: "profile", title: "ตั้งชื่อโปรไฟล์", reward: 5 },
+  { id: "avatar", title: "เปลี่ยนรูปโปรไฟล์", reward: 5 },
+  { id: "friend", title: "เข้าโหมดเพื่อน", reward: 5 },
+  { id: "love", title: "เข้าโหมดแฟน", reward: 5 },
+  { id: "family", title: "เข้าโหมดครอบครัว", reward: 5 },
+  { id: "y2017", title: "เข้าโหมดวัย 2017", reward: 5 },
+  { id: "battle", title: "เล่นโหมดดวล", reward: 10 },
+  { id: "clan", title: "สร้างแคลน", reward: 10 },
+  { id: "skip", title: "ใช้ลัดคำตอบ", reward: 10 },
+  { id: "result", title: "สรุปผล 1 รอบ", reward: 10 }
+];
+
+document.getElementById("uidText").innerText = "UID: " + uid;
+document.getElementById("lvText").innerText = "LV: " + lv + "/" + MAX_LEVEL;
+document.getElementById("avatar").src = avatar;
+document.getElementById("nameInput").value = savedName;
+document.getElementById("displayName").innerText = savedName || "ชื่อมึง";
+document.getElementById("clanText").innerText = clanName ? ("แคลนของมึง: " + clanName) : "ยังไม่มีแคลน";
+
+function saveStore(){
+  localStorage.setItem("uid", uid);
+  localStorage.setItem("lv", lv);
+  localStorage.setItem("gems", gems);
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("timeBoost", timeBoost);
+  localStorage.setItem("avatar", avatar);
+  localStorage.setItem("profileName", savedName);
+  localStorage.setItem("clanName", clanName);
+  localStorage.setItem("clanCode", clanCode);
+  localStorage.setItem("clanMembers", JSON.stringify(clanMembers));
+  localStorage.setItem("petUnlocked", petUnlocked ? "true" : "false");
+  localStorage.setItem("petExp", petExp);
+  localStorage.setItem("canInviteClan", canInviteClan ? "true" : "false");
+  localStorage.setItem("statsUnlocked", statsUnlocked ? "true" : "false");
+  localStorage.setItem("unlockedFootball", unlockedFootball ? "true" : "false");
+  localStorage.setItem("correctGuess", correctGuess);
+  localStorage.setItem("totalGuess", totalGuess);
+  localStorage.setItem("dailyStreak", dailyStreak);
+  localStorage.setItem("dailyLastClaim", dailyLastClaim);
+
+  updateHeader();
+}
+
+function updateHeader(){
+  document.getElementById("uidText").innerText = "UID: " + uid;
+  document.getElementById("lvText").innerText = "LV: " + lv + "/" + MAX_LEVEL;
+  document.getElementById("gemsText").innerText = "💎 " + gems + " | 💰 " + coins + " | ⏱ " + timeBoost;
+  document.getElementById("displayName").innerText = localStorage.getItem("profileName") || "ชื่อมึง";
+
+  const hasAvatar = !!localStorage.getItem("avatar");
+  document.getElementById("avatarNote").innerText = hasAvatar
+    ? "กดรูปตัวเองด้านบนเพื่อเปลี่ยนรูป ใช้ 20💎"
+    : "กดรูปตัวเองด้านบนเพื่อเลือกรูปครั้งแรกฟรี";
+
+  refreshClanUI();
+  renderPetUI();
+  renderStatsUI();
+  renderDailyZone();
+  updateBattleUnlock();
+  renderMissions();
+}
+
+function showZone(id){
+  document.getElementById("dailyZone").classList.add("hidden");
+  document.getElementById("profileZone").classList.add("hidden");
+  document.getElementById("shopZone").classList.add("hidden");
+  document.getElementById("clanZone").classList.add("hidden");
+  document.getElementById("gameZone").classList.add("hidden");
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function pickAvatar(){
+  document.getElementById("avatarUpload").click();
+}
+
+document.getElementById("avatarUpload").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const hasAvatar = !!localStorage.getItem("avatar");
+  if(hasAvatar){
+    if(gems < 20){
+      alert("ต้องใช้ 20💎 เพื่อเปลี่ยนรูป");
+      e.target.value = "";
+      return;
+    }
+    if(!confirm("เปลี่ยนรูปครั้งนี้ใช้ 20💎 นะ")) {
+      e.target.value = "";
+      return;
+    }
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(){
+    if(hasAvatar){
+      gems -= 20;
+    }
+    avatar = reader.result;
+    localStorage.setItem("avatar", avatar);
+    document.getElementById("avatar").src = avatar;
+    alert("บันทึกรูปโปรไฟล์แล้ว");
+    saveStore();
+  };
+  reader.readAsDataURL(file);
+});
+
+function saveName(){
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name){
+    alert("ใส่ชื่อก่อน");
+    return;
+  }
+  savedName = name;
+  localStorage.setItem("profileName", savedName);
+  document.getElementById("displayName").innerText = savedName;
+  alert("บันทึกชื่อแล้ว");
+  saveStore();
+}
+
+function renderDailyZone(){
+  const today = todayKey();
+  const claimedToday = dailyLastClaim === today;
+
+  let nextStreak = dailyStreak;
+  if(!claimedToday){
+    if(dailyLastClaim && isYesterday(dailyLastClaim)){
+      nextStreak = dailyStreak + 1;
+    }else{
+      nextStreak = 1;
+    }
+  }
+
+  const rewardDay = ((nextStreak - 1) % 7) + 1;
+
+  document.getElementById("dailyTitle").innerText = claimedToday ? "รับของวันนี้แล้ว" : "ของวันนี้พร้อมแตก";
+  document.getElementById("dailyStreakText").innerText =
+    "สตรีคปัจจุบัน: " + dailyStreak + " วัน" + (claimedToday ? " | วันนี้รับแล้ว" : "");
+  document.getElementById("dailyRewardText").innerText =
+    "ครั้งถัดไปจะได้ " + dayName(rewardDay) + ": " + describeDailyReward(rewardDay);
+
+  const btn = document.getElementById("dailyClaimBtn");
+  btn.disabled = claimedToday;
+  btn.innerText = claimedToday ? "รับแล้ววันนี้" : "รับของวันนี้";
+}
+
+function claimDailyReward(){
+  const today = todayKey();
+  if(dailyLastClaim === today){
+    alert("รับของวันนี้ไปแล้ว");
+    return;
+  }
+
+  if(dailyLastClaim && isYesterday(dailyLastClaim)){
+    dailyStreak += 1;
+  }else{
+    dailyStreak = 1;
+  }
+
+  const rewardDay = ((dailyStreak - 1) % 7) + 1;
+  const msg = applyDailyReward(rewardDay);
+  dailyLastClaim = today;
+  saveStore();
+  renderDailyZone();
+  alert(dayName(rewardDay) + " ได้: " + msg);
+}
+
+function renderPetUI(){
+  const card = document.getElementById("petCard");
+  if(!card) return;
+
+  if(!petUnlocked){
+    card.classList.add("hidden");
+    return;
+  }
+
+  card.classList.remove("hidden");
+  const petLevel = Math.floor(petExp / 5) + 1;
+  document.getElementById("petText").innerText =
+    "เลเวลสัตว์เลี้ยง: " + petLevel + " | EXP: " + petExp;
+}
+
+function feedPet(){
+  if(!petUnlocked){
+    alert("ปลดล็อกสัตว์เลี้ยงก่อน");
+    return;
+  }
+  if(coins < 20){
+    alert("เงินไม่พอ");
+    return;
+  }
+  coins -= 20;
+  petExp += 1;
+  saveStore();
+  alert("เลี้ยงสัตว์แล้ว");
+}
+
+function renderStatsUI(){
+  const card = document.getElementById("statsCard");
+  if(!card) return;
+
+  if(!statsUnlocked){
+    card.classList.add("hidden");
+    return;
+  }
+
+  card.classList.remove("hidden");
+  const acc = totalGuess ? Math.round((correctGuess / totalGuess) * 100) : 0;
+  document.getElementById("statsText").innerText =
+    "ทายถูก " + correctGuess + " ครั้ง | ตอบทั้งหมด " + totalGuess + " ครั้ง | แม่นยำ " + acc + "%";
+}
+
+function buyTime(){
+  if(coins < 100){
+    alert("เงินไม่พอ");
+    return;
+  }
+  coins -= 100;
+  timeBoost += 1;
+  saveStore();
+  alert("ได้โบนัสเวลา +1");
+}
+
+function skipQuestion(){
+  if(coins < 200){
+    alert("เงินไม่พอ");
+    return;
+  }
+  if(document.getElementById("quizPage").classList.contains("hidden")){
+    alert("ใช้ได้ตอนเล่นเกมเท่านั้น");
+    return;
+  }
+  if(mode === "battle"){
+    alert("โหมดดวลใช้ลัดคำตอบไม่ได้");
+    return;
+  }
+
+  coins -= 200;
+  i++;
+  missionDone["skip"] = true;
+  saveStore();
+
+  if(i >= questions.length){
+    document.getElementById("quizPage").classList.add("hidden");
+    document.getElementById("resultPage").classList.remove("hidden");
+  }else{
+    showQuestion();
+  }
+}
+
+function gacha(){
+  if(gems < 30){
+    alert("เพชรไม่พอ");
+    return;
+  }
+  gems -= 30;
+  saveStore();
+
+  const rewards = [
+    "🎨 ธีมใหม่",
+    "🔥 คำถามลับ",
+    "👑 VIP 1 ครั้ง",
+    "💎 +10 เพชร",
+    "😂 ดวงซวย ไม่ได้อะไร"
+  ];
+  const r = rewards[Math.floor(Math.random() * rewards.length)];
+  alert("มึงได้: " + r);
+}
+
+function refreshClanUI(){
+  if(!document.getElementById("clanText")) return;
+
+  document.getElementById("clanText").innerText =
+    clanName ? ("แคลนของมึง: " + clanName) : "ยังไม่มีแคลน";
+
+  document.getElementById("clanCodeText").innerText =
+    "โค้ดแคลน: " + (clanCode || "-");
+
+  document.getElementById("clanMembersText").innerText =
+    "สมาชิก: " + (clanMembers.length ? clanMembers.join(", ") : "ยังไม่มีสมาชิก");
+
+  const inviteBtn = document.getElementById("inviteClanBtn");
+  if(inviteBtn){
+    inviteBtn.disabled = !canInviteClan;
+    inviteBtn.innerText = canInviteClan ? "เชิญคนเข้าแคลน" : "เชิญคนเข้าแคลน (ล็อกวัน 4)";
+  }
+}
+
+function createClan(){
+  const profileName = (localStorage.getItem("profileName") || "").trim();
+  if(!profileName){
+    alert("ไปตั้งชื่อโปรไฟล์ก่อน");
+    showZone("profileZone");
+    return;
+  }
+  if(clanName){
+    alert("มึงมีแคลนแล้ว");
+    return;
+  }
+  if(coins < 500){
+    alert("เงินไม่พอ");
+    return;
+  }
+
+  const name = prompt("ชื่อแคลน:");
+  if(!name) return;
+
+  coins -= 500;
+  clanName = name.trim();
+  clanCode = "CLAN-" + Math.floor(1000 + Math.random() * 9000);
+  clanMembers = [profileName];
+
+  localStorage.setItem("clanName", clanName);
+  localStorage.setItem("clanCode", clanCode);
+  localStorage.setItem("clanMembers", JSON.stringify(clanMembers));
+  missionDone["clan"] = true;
+  saveStore();
+  alert("สร้างแคลนแล้ว");
+}
+
+function inviteClan(){
+  if(!canInviteClan){
+    alert("ปลดล็อกวันที่ 4 ก่อน");
+    return;
+  }
+  if(!clanCode){
+    alert("ยังไม่มีโค้ดแคลน");
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(clanCode)
+      .then(() => alert("ก็อปโค้ดแคลนแล้ว"))
+      .catch(() => alert("โค้ดแคลน: " + clanCode));
+  }else{
+    alert("โค้ดแคลน: " + clanCode);
+  }
+}
+
+function joinClan(){
+  const profileName = (localStorage.getItem("profileName") || "").trim();
+  if(!profileName){
+    alert("ไปตั้งชื่อโปรไฟล์ก่อน");
+    showZone("profileZone");
+    return;
+  }
+
+  const code = prompt("ใส่โค้ดแคลน");
+  if(!code) return;
+
+  const name = prompt("ชื่อแคลน");
+  if(!name) return;
+
+  clanCode = code.trim();
+  clanName = name.trim();
+  if(!clanMembers.includes(profileName)){
+    clanMembers.push(profileName);
+  }
+
+  localStorage.setItem("clanName", clanName);
+  localStorage.setItem("clanCode", clanCode);
+  localStorage.setItem("clanMembers", JSON.stringify(clanMembers));
+  saveStore();
+  alert("เข้าแคลนแล้ว");
+}
+
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === "suspended"){
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+function beep(freq, duration, type, gainValue){
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || "sine";
+  osc.frequency.value = freq;
+  gain.gain.value = gainValue || 0.08;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + duration / 1000);
+}
+function playCorrectSound(){
+  beep(880, 90, "sine", 0.09);
+  setTimeout(() => beep(1175, 110, "sine", 0.09), 100);
+}
+function playWrongSound(){
+  beep(240, 120, "square", 0.07);
+  setTimeout(() => beep(160, 150, "square", 0.07), 110);
+}
+
+let mode = "";
+let i = 0;
+let questions = [];
+let currentBattleMode = "standard";
+let battleA = "";
+let battleB = "";
+let battleScoreA = 0;
+let battleScoreB = 0;
+
+const friendQ = [
+  "เพื่อนมึงตลกมั้ย?",
+  "เพื่อนมึงขี้เกียจมั้ย?",
+  "เพื่อนมึงชอบเล่นเกมมั้ย?",
+  "เพื่อนมึงเสียงดังมั้ย?",
+  "เพื่อนมึงนิสัยดีมั้ย?",
+  "เพื่อนมึงเคยแอบดูมือถือคนอื่นมั้ย?",
+  "เพื่อนมึงเคยโกหกเรื่องโง่ๆมั้ย?",
+  "เพื่อนมึงเคยแอบชอบคนในกลุ่มมั้ย?",
+  "เพื่อนมึงเคยแกล้งแรงไปมั้ย?",
+  "เพื่อนมึงเคยทำตัวน่าอายมั้ย?",
+  "เพื่อนมึงเคยนินทามึงมั้ย?",
+  "เพื่อนมึงเคยอิจฉามึงมั้ย?",
+  "เพื่อนมึงเคยเกลียดมึงช่วงนึงมั้ย?",
+  "เพื่อนมึงเคยคิดจะแทงข้างหลังมั้ย?",
+  "เพื่อนมึงจริงใจกับมึง 100% มั้ย?"
+];
+
+const loveQ = [
+  "แฟนมึงน่ารักมั้ย?",
+  "แฟนมึงขี้หึงมั้ย?",
+  "แฟนมึงงอนง่ายมั้ย?",
+  "แฟนมึงชอบอยู่ด้วยมั้ย?",
+  "แฟนมึงใส่ใจมั้ย?",
+  "แฟนมึงเคยแอบคุยคนอื่นมั้ย?",
+  "แฟนมึงเคยโกหกมึงมั้ย?",
+  "แฟนมึงเคยทำมึงเสียใจมั้ย?",
+  "แฟนมึงเคยหายไปเฉยๆมั้ย?",
+  "แฟนมึงเคยงอนแบบไร้เหตุผลมั้ย?",
+  "แฟนมึงเคยนอกใจมั้ย?",
+  "แฟนมึงยังรักมึงจริงมั้ย?",
+  "แฟนมึงอยู่เพราะเหงามั้ย?",
+  "แฟนมึงมีความลับกับมึงมั้ย?",
+  "แฟนมึงเลือกมึงจริงๆรึแค่ไม่มีใคร?"
+];
+
+const familyQ = [
+  "ครอบครัวมึงคุยกันบ่อยมั้ย?",
+  "บ้านมึงชอบกินข้าวพร้อมกันมั้ย?",
+  "ครอบครัวมึงใจดีกันมั้ย?",
+  "มึงคุยกับคนในบ้านง่ายมั้ย?",
+  "บ้านมึงมีบรรยากาศอบอุ่นมั้ย?",
+  "ครอบครัวมึงเคยเถียงกันเรื่องเล็กๆมั้ย?",
+  "มึงเคยเก็บเรื่องไว้ไม่บอกบ้านมั้ย?",
+  "คนในบ้านมึงเข้าใจกันจริงมั้ย?",
+  "บ้านมึงมีคนชอบแกล้งกันมั้ย?",
+  "มึงเคยอยากอยู่เงียบๆคนเดียวมั้ย?",
+  "ครอบครัวมึงภูมิใจในตัวมึงมั้ย?",
+  "มึงกล้าขอคำปรึกษาจากบ้านมั้ย?",
+  "บ้านมึงเป็นที่ที่มึงกลับมาแล้วสบายใจมั้ย?",
+  "คนในบ้านมึงช่วยกันเวลามีปัญหามั้ย?",
+  "ครอบครัวมึงรู้ใจกันมั้ย?"
+];
+
+const y2017Q = [
+  "ปี 2017 มึงติดเพลงในยูทูบมั้ย?",
+  "ตอนนั้นมึงเล่น Facebook หนักมั้ย?",
+  "มึงเคยตั้งสเตตัสยาวๆ แบบดราม่ามั้ย?",
+  "มึงเคยเล่นเกมมือถือฮิตๆ ตอนนั้นมั้ย?",
+  "มึงเคยตามเพื่อนในกลุ่มแชททั้งวันมั้ย?",
+  "มึงเคยดูคลิปรีวิวของ / แกะกล่องมั้ย?",
+  "มึงเคยชอบสติกเกอร์แชทน่ารักๆ มั้ย?",
+  "มึงเคยเล่นเกมแข่งกับเพื่อนในคาบว่างมั้ย?",
+  "มึงเคยถ่ายรูปด้วยฟิลเตอร์จัดๆ มั้ย?",
+  "มึงเคยรู้สึกว่า 2017 เป็นปีที่สนุกมากมั้ย?",
+  "มึงยังจำเพลงฮิตช่วงนั้นได้มั้ย?",
+  "มึงอยากกลับไปใช้ชีวิตแบบปี 2017 อีกมั้ย?"
+];
+
+const battleQ = [
+  "ใครดูน่าจับตากว่ากัน?",
+  "ใครดูติดหูกว่ากัน?",
+  "ใครมีคนพูดถึงมากกว่า?",
+  "ใครดูเข้าถึงง่ายกว่า?",
+  "ใครดูมีคอนเทนต์กว่า?",
+  "ใครดึงดูดคนดูได้มากกว่า?",
+  "ใครดูเป็นกระแสกว่า?",
+  "ใครมีโอกาสไวรัลกว่า?",
+  "ใครน่าติดตามมากกว่า?",
+  "ใครดูมีแรงส่งมากกว่า?",
+  "ใครเหมาะลงคลิปมากกว่า?",
+  "ใครดูมีฐานแฟนคลับกว่า?",
+  "ใครดังกว่ากันจริง?"
+];
+
+const footballQ = [
+  "ใครแตะบอลนิ่งกว่า?",
+  "ใครยิงคมกว่า?",
+  "ใครวิ่งไม่มีหมดกว่า?",
+  "ใครอ่านเกมเก่งกว่า?",
+  "ใครแอสซิสต์ดีกว่า?",
+  "ใครเล่นทีมเวิร์กดีกว่า?",
+  "ใครมีสภาพจิตใจนิ่งกว่า?",
+  "ใครพาบอลหนีกว่า?",
+  "ใครเล่นลูกกลางอากาศดีกว่า?",
+  "ใครเก่งรอบด้านกว่า?",
+  "ใครเหมาะเป็นตัวหลักมากกว่า?"
+];
+
+const celebQ = [
+  "ใครมีคนพูดถึงมากกว่า?",
+  "ใครดูติดหูในโซเชียลกว่า?",
+  "ใครมีโอกาสเป็นกระแสกว่า?",
+  "ใครน่าติดตามมากกว่า?",
+  "ใครดูมีฐานแฟนคลับกว่า?",
+  "ใครเหมาะลงคลิปกว่า?",
+  "ใครดูไวรัลกว่า?",
+  "ใครมีคนแชร์มากกว่า?",
+  "ใครมีคาแรกเตอร์เด่นกว่า?",
+  "ใครดูแรงส่งดีกว่า?",
+  "ใครเหมาะเป็นตัวหลักกว่า?",
+  "ใครดังกว่ากันจริง?"
+];
+
+function renderMissions(){
+  const box = document.getElementById("missionList");
+  if(!box) return;
+
+  box.innerHTML = missionData.map(m => {
+    const done = !!missionDone[m.id];
+    const claimed = !!missionClaimed[m.id];
+    const label = claimed ? "รับแล้ว" : done ? "รับเพชร" : "ยังไม่ทำ";
+    const disabled = (!done || claimed) ? "disabled" : "";
+
+    return `
+      <div class="missionCard">
+        <div style="font-size:14px;margin-bottom:6px;">${m.title}</div>
+        <div style="font-size:12px;opacity:.9;margin-bottom:8px;">+${m.reward}💎</div>
+        <button onclick="claimMission('${m.id}', ${m.reward})" ${disabled} style="width:100%;opacity:${(!done || claimed) ? 0.6 : 1};">
+          ${label}
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+function claimMission(id, reward){
+  if(!missionDone[id]){
+    alert("ทำภารกิจนี้ก่อน");
+    return;
+  }
+  if(missionClaimed[id]){
+    alert("รับเพชรไปแล้ว");
+    return;
+  }
+  gems += reward;
+  missionClaimed[id] = true;
+  saveStore();
+  localStorage.setItem("missionDone", JSON.stringify(missionDone));
+  localStorage.setItem("missionClaimed", JSON.stringify(missionClaimed));
+  alert("รับเพชร +" + reward + " แล้ว");
+}
+
+function updateBattleUnlock(){
+  const fbtn = document.getElementById("footballBattleBtn");
+  if(!fbtn) return;
+
+  if(unlockedFootball){
+    fbtn.disabled = false;
+    fbtn.innerText = "⚽ นักเตะคนไหนเก่งกว่ากัน";
+  }else{
+    fbtn.disabled = true;
+    fbtn.innerText = "⚽ นักเตะคนไหนเก่งกว่ากัน (ล็อกวัน 6)";
+  }
+}
+
+function renderDailyZone(){
+  const today = todayKey();
+  const claimedToday = dailyLastClaim === today;
+
+  let nextStreak = dailyStreak;
+  if(!claimedToday){
+    if(dailyLastClaim && isYesterday(dailyLastClaim)){
+      nextStreak = dailyStreak + 1;
+    }else{
+      nextStreak = 1;
+    }
+  }
+
+  const rewardDay = ((nextStreak - 1) % 7) + 1;
+
+  document.getElementById("dailyTitle").innerText = claimedToday ? "รับของวันนี้แล้ว" : "ของวันนี้พร้อมแตก";
+  document.getElementById("dailyStreakText").innerText =
+    "สตรีคปัจจุบัน: " + dailyStreak + " วัน" + (claimedToday ? " | วันนี้รับแล้ว" : "");
+  document.getElementById("dailyRewardText").innerText =
+    "ครั้งถัดไปจะได้ " + dayName(rewardDay) + ": " + describeDailyReward(rewardDay);
+
+  const btn = document.getElementById("dailyClaimBtn");
+  btn.disabled = claimedToday;
+  btn.innerText = claimedToday ? "รับแล้ววันนี้" : "รับของวันนี้";
+}
+
+function claimDailyReward(){
+  const today = todayKey();
+  if(dailyLastClaim === today){
+    alert("รับของวันนี้ไปแล้ว");
+    return;
+  }
+
+  if(dailyLastClaim && isYesterday(dailyLastClaim)){
+    dailyStreak += 1;
+  }else{
+    dailyStreak = 1;
+  }
+
+  const rewardDay = ((dailyStreak - 1) % 7) + 1;
+  const msg = applyDailyReward(rewardDay);
+  dailyLastClaim = today;
+  saveStore();
+  alert(dayName(rewardDay) + " ได้: " + msg);
+}
+
+function renderPetUI(){
+  const card = document.getElementById("petCard");
+  if(!card) return;
+
+  if(!petUnlocked){
+    card.classList.add("hidden");
+    return;
+  }
+
+  card.classList.remove("hidden");
+  const petLevel = Math.floor(petExp / 5) + 1;
+  document.getElementById("petText").innerText =
+    "เลเวลสัตว์เลี้ยง: " + petLevel + " | EXP: " + petExp;
+}
+
+function feedPet(){
+  if(!petUnlocked){
+    alert("ปลดล็อกสัตว์เลี้ยงก่อน");
+    return;
+  }
+  if(coins < 20){
+    alert("เงินไม่พอ");
+    return;
+  }
+  coins -= 20;
+  petExp += 1;
+  saveStore();
+  alert("เลี้ยงสัตว์แล้ว");
+}
+
+function renderStatsUI(){
+  const card = document.getElementById("statsCard");
+  if(!card) return;
+
+  if(!statsUnlocked){
+    card.classList.add("hidden");
+    return;
+  }
+
+  card.classList.remove("hidden");
+  const acc = totalGuess ? Math.round((correctGuess / totalGuess) * 100) : 0;
+  document.getElementById("statsText").innerText =
+    "ทายถูก " + correctGuess + " ครั้ง | ตอบทั้งหมด " + totalGuess + " ครั้ง | แม่นยำ " + acc + "%";
+}
+
+function saveName(){
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name){
+    alert("ใส่ชื่อก่อน");
+    return;
+  }
+  savedName = name;
+  localStorage.setItem("profileName", savedName);
+  document.getElementById("displayName").innerText = savedName;
+  missionDone["profile"] = true;
+  saveStore();
+  alert("บันทึกชื่อแล้ว");
+}
+
+function buyTime(){
+  if(coins < 100){
+    alert("เงินไม่พอ");
+    return;
+  }
+  coins -= 100;
+  timeBoost += 1;
+  saveStore();
+  alert("ได้โบนัสเวลา +1");
+}
+
+function skipQuestion(){
+  if(coins < 200){
+    alert("เงินไม่พอ");
+    return;
+  }
+  if(document.getElementById("quizPage").classList.contains("hidden")){
+    alert("ใช้ได้ตอนเล่นเกมเท่านั้น");
+    return;
+  }
+  if(mode === "battle"){
+    alert("โหมดดวลใช้ลัดคำตอบไม่ได้");
+    return;
+  }
+
+  coins -= 200;
+  i++;
+  missionDone["skip"] = true;
+  saveStore();
+
+  if(i >= questions.length){
+    document.getElementById("quizPage").classList.add("hidden");
+    document.getElementById("resultPage").classList.remove("hidden");
+  }else{
+    showQuestion();
+  }
+}
+
+function gacha(){
+  if(gems < 30){
+    alert("เพชรไม่พอ");
+    return;
+  }
+  gems -= 30;
+  saveStore();
+
+  const rewards = [
+    "🎨 ธีมใหม่",
+    "🔥 คำถามลับ",
+    "👑 VIP 1 ครั้ง",
+    "💎 +10 เพชร",
+    "😂 ดวงซวย ไม่ได้อะไร"
+  ];
+  const r = rewards[Math.floor(Math.random() * rewards.length)];
+  alert("มึงได้: " + r);
+}
+
+function openBattleMode(type){
+  if(type === "football" && !unlockedFootball){
+    alert("ปลดล็อกวันที่ 6 ก่อน");
+    return;
+  }
+  currentBattleMode = type;
+  showZone("gameZone");
+  document.getElementById("modePage").classList.add("hidden");
+  document.getElementById("battleSetup").classList.remove("hidden");
+  document.getElementById("quizPage").classList.add("hidden");
+  document.getElementById("resultPage").classList.add("hidden");
+  document.getElementById("battleResultPage").classList.add("hidden");
+
+  if(type === "football"){
+    document.getElementById("battleSetupTitle").innerText = "นักเตะคนไหนเก่งกว่ากัน";
+    document.getElementById("battleSetupDesc").innerText = "โหมดดวล 11 ข้อ บอก % ชัดเจน";
+    document.getElementById("battleA").placeholder = "นักเตะคนที่ 1";
+    document.getElementById("battleB").placeholder = "นักเตะคนที่ 2";
+  }else{
+    document.getElementById("battleSetupTitle").innerText = "เกมไหนดังกว่ากัน";
+    document.getElementById("battleSetupDesc").innerText = "โหมดดวล 13 ข้อ บอก % ชัดเจน";
+    document.getElementById("battleA").placeholder = "เกม / สิ่งของ 1";
+    document.getElementById("battleB").placeholder = "เกม / สิ่งของ 2";
+  }
+}
+
+function startGame(m){
+  const profileName = (localStorage.getItem("profileName") || "").trim();
+  const targetName = document.getElementById("targetInput").value.trim();
+
+  if(!profileName){
+    alert("ไปตั้งชื่อโปรไฟล์ก่อน");
+    showZone("profileZone");
+    return;
+  }
+  if(!targetName){
+    alert("ใส่ชื่ออีกคนก่อน");
+    return;
+  }
+
+  mode = m;
+  i = 0;
+  battleScoreA = 0;
+  battleScoreB = 0;
+
+  if(mode === "love") questions = loveQ;
+  else if(mode === "family") questions = familyQ;
+  else if(mode === "y2017") questions = y2017Q;
+  else questions = friendQ;
+
+  if(mode === "friend") missionDone["friend"] = true;
+  if(mode === "love") missionDone["love"] = true;
+  if(mode === "family") missionDone["family"] = true;
+  if(mode === "y2017") missionDone["y2017"] = true;
+  localStorage.setItem("missionDone", JSON.stringify(missionDone));
+  renderMissions();
+
+  showZone("gameZone");
+  document.getElementById("modePage").classList.add("hidden");
+  document.getElementById("battleSetup").classList.add("hidden");
+  document.getElementById("quizPage").classList.remove("hidden");
+  document.getElementById("resultPage").classList.add("hidden");
+  document.getElementById("battleResultPage").classList.add("hidden");
+
+  const modeLabel =
+    mode === "love" ? "❤️ แฟน" :
+    mode === "family" ? "🏠 ครอบครัว" :
+    mode === "y2017" ? "📼 วัย 2017" :
+    "👬 เพื่อน";
+
+  document.getElementById("playerText").innerText =
+    profileName + " " + modeLabel + " ทายใจ " + targetName;
+
+  showQuestion();
+}
+
+function startBattle(){
+  const a = document.getElementById("battleA").value.trim();
+  const b = document.getElementById("battleB").value.trim();
+
+  if(!a || !b){
+    alert("ใส่ชื่อ 2 อย่างก่อน");
+    return;
+  }
+
+  battleA = a;
+  battleB = b;
+  mode = "battle";
+  questions = (currentBattleMode === "football") ? footballQ : battleQ;
+  i = 0;
+  battleScoreA = 0;
+  battleScoreB = 0;
+
+  missionDone["battle"] = true;
+  localStorage.setItem("missionDone", JSON.stringify(missionDone));
+  renderMissions();
+
+  document.getElementById("battleSetup").classList.add("hidden");
+  document.getElementById("quizPage").classList.remove("hidden");
+  document.getElementById("resultPage").classList.add("hidden");
+  document.getElementById("battleResultPage").classList.add("hidden");
+
+  document.getElementById("playerText").innerText =
+    (currentBattleMode === "football" ? "นักเตะคนไหนเก่งกว่ากัน: " : "เกมไหนดังกว่ากัน: ") + battleA + " vs " + battleB;
+
+  showQuestion();
+}
+
+function showQuestion(){
+  if(i >= questions.length){
+    if(mode === "battle"){
+      showBattleResult();
+    }else{
+      document.getElementById("quizPage").classList.add("hidden");
+      document.getElementById("resultPage").classList.remove("hidden");
+    }
+    return;
+  }
+
+  let hint = "";
+  if(mode === "y2017"){
+    if(i < 4) hint = "📼 ปกติ";
+    else if(i < 8) hint = "📼 ยุค 2017";
+    else hint = "📼 พีคย้อนยุค";
+  }else if(mode === "battle"){
+    if(i < 5) hint = "⚔️ ช่วงต้นเกม";
+    else if(i < 9) hint = "⚔️ กำลังสูสี";
+    else hint = "⚔️ ช่วงตัดสิน";
+  }else{
+    if(i < 5) hint = "😇 ปกติ";
+    else if(i < 10) hint = "😏 เริ่มแปลก";
+    else hint = "💀 พีค";
+  }
+
+  document.getElementById("questionText").innerText =
+    "ข้อ " + (i+1) + "/" + questions.length + " : " + questions[i];
+  document.getElementById("levelHint").innerText =
+    "ระดับ: " + hint + (timeBoost > 0 ? " | โบนัสเวลา +" + timeBoost : "");
+
+  if(mode === "battle"){
+    document.getElementById("btn1").innerText = battleA;
+    document.getElementById("btn2").innerText = battleB;
+  }else{
+    document.getElementById("btn1").innerText = "ถูก";
+    document.getElementById("btn2").innerText = "ผิด";
+  }
+}
+
+function answer(isFirst){
+  if(mode === "battle"){
+    if(isFirst){
+      battleScoreA++;
+      playCorrectSound();
+    }else{
+      battleScoreB++;
+      playWrongSound();
+    }
+  }else{
+    if(isFirst) playCorrectSound();
+    else playWrongSound();
+
+    totalGuess += 1;
+    if(isFirst) correctGuess += 1;
+    missionDone["result"] = missionDone["result"] || false;
+  }
+
+  i++;
+  saveStore();
+
+  if(i >= questions.length){
+    if(mode === "battle"){
+      showBattleResult();
+    }else{
+      document.getElementById("quizPage").classList.add("hidden");
+      document.getElementById("resultPage").classList.remove("hidden");
+    }
+  }else{
+    showQuestion();
+  }
+}
+
+function levelUp(){
+  if(lv < MAX_LEVEL){
+    lv += 1;
+  }
+}
+
+function rewardMoney(){
+  const reward = Math.floor(100 + Math.random() * 200);
+  coins += reward;
+  return reward;
+}
+
+function showResult(){
+  const real = document.getElementById("realScore").value;
+  if(real === ""){
+    alert("ใส่คะแนนก่อน");
+    return;
+  }
+
+  const n = parseInt(real, 10);
+  const total = questions.length;
+  const ratio = n / total;
+
+  let txt = "";
+  let color = "";
+
+  if(ratio >= 0.8){
+    txt = "โคตรรู้ใจกัน 💀❤️";
+    color = "#00ffcc";
+  }else if(ratio >= 0.55){
+    txt = "พอรู้ใจกันอยู่นะ 😏";
+    color = "#ffd166";
+  }else{
+    txt = "มึงไม่รู้จักกันเลย 555 😂";
+    color = "#ff4d6d";
+  }
+
+  document.getElementById("finalText").innerHTML =
+    "ให้ " + real + "/" + total +
+    "<br><br><span style='color:" + color + "'>" + txt + "</span>";
+
+  rewardMoney();
+  levelUp();
+  missionDone["result"] = true;
+  saveStore();
+
+  setTimeout(resetGame, 2000);
+}
+
+function showBattleResult(){
+  const total = questions.length;
+  const aPct = Math.round((battleScoreA / total) * 100);
+  const bPct = 100 - aPct;
+  const winner =
+    aPct > bPct ? battleA :
+    bPct > aPct ? battleB :
+    "สูสีมาก";
+
+  document.getElementById("quizPage").classList.add("hidden");
+  document.getElementById("battleResultPage").classList.remove("hidden");
+
+  const word = currentBattleMode === "football" ? "เก่งกว่า" : "ดังกว่า";
+
+  document.getElementById("battleResultText").innerHTML =
+    battleA + " " + aPct + "% | " + battleB + " " + bPct + "%<br><br>" +
+    word + ": <span style='color:#00ffcc'>" + winner + "</span>";
+
+  document.getElementById("battleBars").innerHTML = `
+    <div class="barWrap">
+      <div class="barLabel">${battleA} - ${aPct}%</div>
+      <div class="bar"><div style="width:${aPct}%"></div></div>
+      <div class="barLabel" style="margin-top:8px;">${battleB} - ${bPct}%</div>
+      <div class="bar"><div style="width:${bPct}%"></div></div>
+    </div>
+  `;
+
+  rewardMoney();
+  levelUp();
+  missionDone["result"] = true;
+  saveStore();
+
+  setTimeout(resetGame, 2000);
+}
+
+function resetGame(){
+  document.getElementById("realScore").value = "";
+  document.getElementById("finalText").innerText = "";
+  document.getElementById("resultPage").classList.add("hidden");
+  document.getElementById("battleResultPage").classList.add("hidden");
+  document.getElementById("quizPage").classList.add("hidden");
+  document.getElementById("battleSetup").classList.add("hidden");
+  document.getElementById("modePage").classList.remove("hidden");
+  document.getElementById("targetInput").value = "";
+  document.getElementById("battleA").value = "";
+  document.getElementById("battleB").value = "";
+  showZone("dailyZone");
+}
+
+function openCelebMode(){
+  alert("โหมดคนดังยังไม่ได้เปิดในไฟล์นี้");
+}
+
+/* init */
+renderDailyZone();
+updateBattleUnlock();
+renderPetUI();
+renderStatsUI();
+renderMissions();
+refreshClanUI();
+showZone("dailyZone");
+updateHeader();
+</script>
+</body>
+  </html>
