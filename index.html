@@ -1467,27 +1467,38 @@ renderStatsUI();
 renderMissions();
 refreshClanUI();
 showZone("dailyZone");
+
 updateHeader();
+  if(localStorage.getItem("isGM") === "true"){
+  document.getElementById("gmPanel").style.display = "block";
+  }
   let clickCount = 0;
 
 document.addEventListener("click", function() {
   clickCount++;
 
+setTimeout(() => {
+  clickCount = 0;
+}, 2000);
+
   if (clickCount >= 5) {
     let code = prompt("ใส่รหัสลับ");
+
     if (code === "1122") {
       alert("เข้า GM แล้ว");
-      localStorage.setItem("isGM","true");
+      localStorage.setItem("isGM", "true");
+      document.getElementById("gmPanel").style.display = "block";
     } else {
       alert("รหัสผิด");
     }
+
     clickCount = 0;
   }
-
-  setTimeout(() => {
-    clickCount = 0;
-  }, 2000);
 });
 </script>
+  <div id="gmPanel" style="display:none; position:fixed; bottom:20px; right:20px;">
+  <button onclick="alert('เงิน +1B')">+เงิน</button>
+  <button onclick="alert('เพลช +1B')">+เพลช</button>
+  </div>
 </body>
   </html>
